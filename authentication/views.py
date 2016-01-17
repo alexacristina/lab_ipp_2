@@ -1,15 +1,10 @@
-from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from django.contrib.auth import login
 from django.contrib.auth import hashers
 from django.http import HttpResponse
 from django.http import JsonResponse
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
@@ -18,7 +13,6 @@ from rest_framework.decorators import detail_route
 from authentication.serializers import UserSerializer
 from authentication.serializers import ChangePasswordSerializer
 from authentication.permissions import IsAuthenticatedOrCreate
-from authentication.serializers import GroupSerializer
 
 
 class UserViewSet(ModelViewSet):
@@ -31,6 +25,7 @@ class UserViewSet(ModelViewSet):
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         data = serializer.data
         u, created = User.objects.get_or_create(username=data['username'])
         u.set_password(data['password'])
@@ -41,24 +36,20 @@ class UserViewSet(ModelViewSet):
     def last_login(self, request, pk):
         user = self.get_object()
         last_user_login = user.last_login
-        return Response({'username': user.username,
-                        'last_login' : last_user_login })
+        return Response({
+            'username': user.username,
+            'last_login' : last_user_login
+        })
 
     @detail_route(methods=['post'])
     def change_password(self, request, pk):
         serializer = ChangePasswordSerializer(
             data=request.data,
-            context={'request':request})
-        user = self.get_object()
+            context={'request':request}
+        )
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response({'username': user.username})
+            return Response({'result': 'The password has been changed successfully'})
         else:
-            return Response({'invalid': 'invalid'})
-
-class GroupViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    required_scopes = ['groups']
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+            return Response({'invalid': 'The data entered is invalid'})

@@ -3,14 +3,13 @@ from django.contrib import admin
 
 from rest_framework import routers
 
-from authentication.views import GroupViewSet
+
 from authentication.views import UserViewSet
-# from authentication.views import register_by_access_token
+
 
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
 
 urlpatterns = patterns('',
     url(r'^', include(router.urls)),

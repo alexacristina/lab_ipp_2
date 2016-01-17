@@ -35,12 +35,8 @@ class ChangePasswordSerializer(serializers.Serializer):
 
         if not self.old_password_field_enabled:
             self.fields.pop('old_password')
-        print (self.context)
         self.request = self.context.get('request')
-        print (self.request)
         self.user = getattr(self.request, 'user')
-        # self.user = User.objects.get(username=username)
-        print (self.user)
 
     def validate_old_password(self, value):
         invalid_password_conditions = (
@@ -68,15 +64,4 @@ class ChangePasswordSerializer(serializers.Serializer):
             update_session_auth_hash(self.request, self.user)
 
 
-    def patch(self, instance, validated_data):
-        password = validated_data.get('password')
-        new_password_data = validated_data.pop('new_password')
-        confirm_password_data = validated_data.pop('confirm_password')
-        return instance
-
-
-class GroupSerializer(Serializer):
-
-    class Meta:
-        model = Group
 
