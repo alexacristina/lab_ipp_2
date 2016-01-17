@@ -30,7 +30,7 @@ class UserViewSet(ModelViewSet):
         u, created = User.objects.get_or_create(username=data['username'])
         u.set_password(data['password'])
         u.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'message': 'The user has been created successfully'}, status=status.HTTP_201_CREATED)
 
     @detail_route(methods=['get'], permission_classes=[IsAuthenticated])
     def last_login(self, request, pk):
